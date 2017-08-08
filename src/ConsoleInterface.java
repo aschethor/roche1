@@ -124,7 +124,8 @@ public class ConsoleInterface {
                 out(" ( 6) change description");
                 out(" ( 7) similar studies");
                 out(" ( 8) similar channels");
-                out(" ( 9) delete study");
+                out(" ( 9) copy study");
+                out(" (10) delete study");
                 int choice = inInt();
                 if (choice == 0) {
                     return;
@@ -244,6 +245,11 @@ public class ConsoleInterface {
                     }
                     inString();
                 } else if (choice == 9) {
+                    cls();
+                    out("enter copied study name:");
+                    study.deleteStudy(account);
+                    return;
+                } else if (choice == 10) {
                     study.deleteStudy(account);
                     return;
                 }

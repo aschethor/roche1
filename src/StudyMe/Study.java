@@ -140,6 +140,14 @@ public class Study {
         Database.mysql.update("DELETE FROM tag_tag WHERE (ID_tag1 = ? AND ID_tag2 = ?) OR (ID_tag1 = ? AND ID_tag2 = ?)",""+tag1.getId(),""+tag2.getId(),""+tag2.getId(),""+tag1.getId());
     }
 
+    public Study copyStudy(Account account,String name)throws Exception{
+        if(!hasReadPermission(account))throw new Error("You aren't allowed to read this study");
+        Study ret = account.createStudy(name);
+        ret.setDescription(account,getDescription(account));
+        //TODO: Tag_pointers, Channels, data, Tag_tag, tag_channel
+        return null;
+    }
+
     public void deleteStudy(Account account)throws Exception{
         if(!hasWritePermission(account))throw new Error("You aren't allowed to delete this study");
         //check last author
