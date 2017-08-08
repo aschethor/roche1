@@ -229,7 +229,7 @@ public class ConsoleInterface {
                     study.setDescription(account, inString());
                 } else if (choice == 7) {
                     cls();
-                    Vector<Study> studies = study.getSimilarStudies2(account);
+                    Vector<Study> studies = study.getSimilarStudies(account);
                     out("similar studies (ID / name)");
                     for(Study s:studies)out(""+s.getId()+" / "+s.getName(account));
                     inString();

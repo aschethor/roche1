@@ -150,7 +150,7 @@ public class Study {
         Database.mysql.update("DELETE FROM study WHERE id = ?",""+id);
     }
 
-    public Vector<Study> getSimilarStudies(Account account)throws Exception{
+    public Vector<Study> getSimilarStudiesNaive(Account account)throws Exception{
         if(!hasReadPermission(account))throw new Error("You aren't allowed to read this study");
         Vector<Tag> tags = getTags(account);
         Vector<TagLink> tagLinks = getTagLinks(account);
@@ -177,23 +177,23 @@ public class Study {
         return ret;
     }
 
-    public Vector<Study> getSimilarStudies2(Account account)throws Exception{
+    public Vector<Study> getSimilarStudies(Account account)throws Exception{
         if(!hasReadPermission(account))throw new Error("You aren't allowed to read this study");
         Vector<Tag> tags = getTags(account);
         Vector<TagLink> tagLinks = getTagLinks(account);
         Map<Integer,Integer> tagMap = new HashMap<>();
         for (int i=0;i<tags.size();i++)tagMap.put(tags.get(i).getId(),i);
-        String query = "SELECT DISTINCT s.ID FROM study s";
-        for(int i=tags.size()-1;i>=0;i--)query += ", tag_pointer t"+i;
-        for(int i=0;i<tagLinks.size();i++)query += ", tag_tag l"+i;
-        query += " WHERE TRUE";
+        String query = "SELECT DISTINCT s.ID FROM study s WHERE TRUE";
         //tags correspond to tags in this study and are in the same study
-        for (int i=tags.size()-1;i>=0;i--)query += " AND t"+i+".ID_tag = "+tags.get(i).getTagId(account)+" AND t"+i+".ID_study = s.ID";
-        //tag-links correspond to tag-links in this study
-        for (int i=0;i<tagLinks.size();i++)query += " AND ((l"+i+".ID_tag1 = t"+tagMap.get(tagLinks.get(i).getTag1().getId())+".ID"+
-                " AND l"+i+".ID_tag2 = t"+tagMap.get(tagLinks.get(i).getTag2().getId())+".ID) OR " +
-                "(l"+i+".ID_tag1 = t"+tagMap.get(tagLinks.get(i).getTag2().getId())+".ID"+
+        for (int i=0;i<tags.size();i++)query += " AND EXISTS ( SELECT t"+i+".ID FROM tag_pointer t"+i+" WHERE t"+i+".ID_tag = "+tags.get(i).getTagId(account)+" AND t"+i+".ID_study = s.ID";
+        for (int i=0;i<tagLinks.size();i++)query += " AND EXISTS ( SELECT l"+i+".ID FROM tag_tag l"+i+" WHERE" +
+                " ((l"+i+".ID_tag1 = t"+tagMap.get(tagLinks.get(i).getTag1().getId())+".ID"+
+                " AND l"+i+".ID_tag2 = t"+tagMap.get(tagLinks.get(i).getTag2().getId())+".ID) OR" +
+                " (l"+i+".ID_tag1 = t"+tagMap.get(tagLinks.get(i).getTag2().getId())+".ID"+
                 " AND l"+i+".ID_tag2 = t"+tagMap.get(tagLinks.get(i).getTag1().getId())+".ID))";
+        for (int i=0;i<tags.size();i++)query += ")";
+        for (int i=0;i<tagLinks.size();i++)query += ")";
+        //tag-links correspond to tag-links in this study
         System.out.println("Monster query:");
         System.out.println(query);
         long currentTime = System.currentTimeMillis();
@@ -204,7 +204,7 @@ public class Study {
         return ret;
     }
 
-    public Vector<Vector<Channel>> getSimilarChannels(Account account)throws Exception{
+    public Vector<Vector<Channel>> getSimilarChannelsNaive(Account account)throws Exception{
         if(!hasReadPermission(account))throw new Error("You aren't allowed to read this study");
         Vector<Channel> channels = getChannels(account);
         if(channels.size()<=0)throw new Error("The study needs at least one channel in order to search for similar channels");
@@ -240,6 +240,60 @@ public class Study {
                 query += " AND cl"+i+"_"+j+".ID_channel = c"+i+".ID AND cl"+i+"_"+j+".ID_tag = t"+tagMap.get(channelLinks.get(i).get(j).getId())+".ID";
             }
         }
+        System.out.println("Super Monster query:");
+        System.out.println(query);
+        long currentTime = System.currentTimeMillis();
+        ResultSet resultSet = Database.mysql.query(query);
+        System.out.println("query time: "+((double)System.currentTimeMillis()-currentTime)/1000+" s");
+        Vector<Vector<Channel>> ret = new Vector<>();
+        while (resultSet.next()){
+            Vector<Channel> channelVector = new Vector<>();
+            for(int i=0;i<channels.size();i++)channelVector.add(new Channel(resultSet.getInt("c"+i+".ID")));
+            ret.add(channelVector);
+        }
+        return ret;
+    }
+
+    public Vector<Vector<Channel>> getSimilarChannels(Account account)throws Exception{
+        if(!hasReadPermission(account))throw new Error("You aren't allowed to read this study");
+        Vector<Channel> channels = getChannels(account);
+        if(channels.size()<=0)throw new Error("The study needs at least one channel in order to search for similar channels");
+        Vector<Vector<Tag>> channelLinks = new Vector<>();
+        Vector<Tag> tags = getTags(account);
+        Vector<TagLink> tagLinks = getTagLinks(account);
+        Map<Integer,Integer> tagMap = new HashMap<>();
+        for (int i=0;i<tags.size();i++)tagMap.put(tags.get(i).getId(),i);
+        String query = "SELECT s.ID";
+        for(int i=0;i<channels.size();i++)query += ", c"+i+".ID";
+        query += " FROM study s";
+        for(int i=0;i<channels.size();i++){
+            query += ", channel c"+i;
+            channelLinks.add(channels.get(i).getTags(account));
+        }
+        query += " WHERE TRUE";
+        for (int i=0;i<channels.size();i++){
+            query += " AND c"+i+".ID_study = s.ID";
+            if(!channels.get(i).getName(account).equals("?"))query += " AND c"+i+".name = '"+channels.get(i).getName(account)+"'";
+            if(!channels.get(i).getUnit(account).equals("?"))query += " AND c"+i+".unit = '"+channels.get(i).getUnit(account)+"'";
+        }
+        //tags correspond to tags in this study and are in the same study
+        for (int i=0;i<tags.size();i++)query += " AND EXISTS ( SELECT t"+i+".ID FROM tag_pointer t"+i+" WHERE t"+i+".ID_tag = "+tags.get(i).getTagId(account)+" AND t"+i+".ID_study = s.ID";
+        for (int i=0;i<tagLinks.size();i++)query += " AND EXISTS ( SELECT l"+i+".ID FROM tag_tag l"+i+" WHERE" +
+                " ((l"+i+".ID_tag1 = t"+tagMap.get(tagLinks.get(i).getTag1().getId())+".ID"+
+                " AND l"+i+".ID_tag2 = t"+tagMap.get(tagLinks.get(i).getTag2().getId())+".ID) OR" +
+                " (l"+i+".ID_tag1 = t"+tagMap.get(tagLinks.get(i).getTag2().getId())+".ID"+
+                " AND l"+i+".ID_tag2 = t"+tagMap.get(tagLinks.get(i).getTag1().getId())+".ID))";
+        //channels correspond to channels in this study and are in the same study
+        for (int i=0;i<channels.size();i++){
+            for(int j=0;j<channelLinks.get(i).size();j++){
+                query += " AND EXISTS ( SELECT cl"+i+"_"+j+".ID FROM tag_channel cl"+i+"_"+j+" WHERE cl"+i+"_"+j+".ID_channel = c"+i+".ID AND cl"+i+"_"+j+".ID_tag = t"+tagMap.get(channelLinks.get(i).get(j).getId())+".ID";
+            }
+        }
+
+        for (int i=0;i<tags.size();i++)query += ")";
+        for (int i=0;i<tagLinks.size();i++)query += ")";
+        for (int i=0;i<channels.size();i++)for(int j=0;j<channelLinks.get(i).size();j++)query+=")";
+
         System.out.println("Super Monster query:");
         System.out.println(query);
         long currentTime = System.currentTimeMillis();
