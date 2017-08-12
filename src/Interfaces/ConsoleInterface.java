@@ -1,12 +1,17 @@
+package Interfaces;
+
 import StudyMe.*;
 import StudyMe.Error;
 
 import java.util.Scanner;
 import java.util.Vector;
 
+/**
+ * simple console interface in order to access the database
+ */
 public class ConsoleInterface {
     private static Scanner scanner = new Scanner(System.in);
-    public static Account loginDialog() throws Exception{
+    public static Account loginScreen() throws Exception{
         while(true) {
             out("possible actions:");
             out(" ( 0) login");
@@ -351,7 +356,7 @@ public class ConsoleInterface {
         }
     }
     public static void main(String... args) throws Exception{
-        Account account = loginDialog();
+        Account account = loginScreen();
         startScreen(account);
     }
     public static void out(String s){
