@@ -36,8 +36,9 @@ public class SmartInterface {
 
         @Override
         public void run() {
+            String username="";
             try {
-                String username = in.nextLine();
+                username = in.nextLine();
                 Account account = Account.getAccountByUsername(username);
                 String password = in.nextLine();
                 if(!password.equals(account.getPassword())){
@@ -79,7 +80,8 @@ public class SmartInterface {
                 System.out.println("Connection with "+username+" ended");
                 socket.close();
             }catch (Exception e){
-                e.printStackTrace();
+                System.out.println("Connection with "+username+" abruptly ended");
+                //e.printStackTrace();
             }
         }
     }
