@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 
 /**
  * Created by Ni on 19.02.2015.
- * einfacher HTTP-Server (NiWa Nightly ;)
+ * simple HTTP-Server (NiWa Nightly ;)
  */
 public class HTTPServer extends Thread {
     int port;

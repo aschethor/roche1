@@ -14,7 +14,7 @@ public class HTTPSServer extends Thread {
     String folder;
     String keyFile;
     String pw;
-    //erstellen des Keys mit keytool (in jdkX_Y\jre\bin zu finden):
+    //create a key with the keytool (located in jdkX_Y\jre\bin):
     //keytool -genkey -keystore Name.keystore -keyalg RSA
     //final static String pathToStores = "C:\\Programmieren\\Java\\jdk7_80\\jre\\bin";
     //final static String keyStoreFile = "Test.keystore";

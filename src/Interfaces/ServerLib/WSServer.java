@@ -7,11 +7,11 @@ import java.security.MessageDigest;
 
 /**
  * Created by Ni on 05.06.2015.
- * einfacher WebSocket-Server
- * so funzts:
- * 1.) Erstelle eine Klasse, die WSServer.WebSocket extended
- * 2.) fülle in ihr die Methoden onStart(), onMessage() & onEnd() aus
- * 3.) starte eine WSServer-Instanz, in der die getWS()-Methode ein Objekt der erstellten Klasse zurückgibt
+ * simple WebSocket-Server
+ * how it works:
+ * 1.) create a class which extends WSServer.WebSocket
+ * 2.) overwrite the methods onStart(), onMessage() & onEnd()
+ * 3.) start a WSServer-Instance which returns objects of the created class in its getWS()-method
  */
 public abstract class WSServer extends Thread {
     int port;
@@ -174,7 +174,7 @@ public abstract class WSServer extends Thread {
                 }
 
                 if(opcode==0x0)
-                    throw new Exception("Continuation frames don't supported :"+UTF8ToString(data)+".");
+                    throw new Exception("Continuation frames aren't supported :"+UTF8ToString(data)+".");
 
             }while (!istext);
             return UTF8ToString(data);
