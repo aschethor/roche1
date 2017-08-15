@@ -21,7 +21,7 @@
     <link href="theme.css" rel="stylesheet">
 	
 	<script src="cookie.js"></script>
-	<script src="home.js"></script>
+	<script src="account.js"></script>
 
   </head>
 
@@ -41,9 +41,8 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href="home">Home</a></li>
-            <li><a href="account">Account</a></li>
-            
+            <li><a href="home">Home</a></li>
+            <li class="active"><a href="account">Account</a></li>
             <!--li><a href="study">Contact</a></li-->
           </ul>
         </div><!--/.nav-collapse -->
@@ -52,23 +51,32 @@
 
     <div class="container theme-showcase" role="main">
 
-      <div class="page-header">
-        <h1 id="greetings">Hi!</h1>
-      </div>
+
 	  <div class="row">
-	  <div class="col-sm-8">
-		<h2>My studies</h2>
-          <div class="list-group" id="studies">
-          </div>
-			<input type="text" id="create_study" class="form-control" placeholder="create study" onkeypress="if(event.keyCode==13)create_study()">
-        </div><!-- /.col-sm-8 -->
 	  <div class="col-sm-4">
-		<h2>Search</h2>
+	        <div class="page-header">
+				<h1 id="greetings">Hi!</h1>
+			  </div>
+		<!--h2>Search</h2>
 			<div class="list-group">
 			<input type="text" id="inputSearch" class="form-control" placeholder="search...">
-			</div>
-		  <button class="btn btn-default">go!</button>
+			</div-->
+		  <button class="btn btn-default" onclick="logout()">logout</button>
         </div><!-- /.col-sm-4 -->
+	  <div class="col-sm-8">
+          <div class="list-group" id="studies">
+          </div>
+			<h2>change username</h2>
+			<input type="text" id="change_username" class="form-control" placeholder="username" onkeypress="if(event.keyCode==13)change_username()">
+			<h2>change password</h2>
+			<input type="password" id="change_password" class="form-control" placeholder="password" onkeypress="if(event.keyCode==13)change_password()">
+			<h2>change name</h2>
+			<input type="text" id="change_name" class="form-control" placeholder="name" onkeypress="if(event.keyCode==13)change_name()">
+			<h2>change email</h2>
+			<input type="text" id="change_email" class="form-control" placeholder="email" onkeypress="if(event.keyCode==13)change_email()">
+			<h2>delete Account</h2>
+		    <button class="btn btn-default" id="delete_account" onclick="delete_account()">delete Account</button>
+        </div><!-- /.col-sm-8 -->
 		</div>
 
         

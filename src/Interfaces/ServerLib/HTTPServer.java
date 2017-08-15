@@ -67,8 +67,7 @@ public class HTTPServer extends Thread {
 
         public void run() {
             try {
-                //PrintStream OUT = new PrintStream(connection.getOutputStream());
-                String filename = "";
+                String request = "";
 
                 //Client-request
                 while (true) {
@@ -77,9 +76,9 @@ public class HTTPServer extends Thread {
 
                     Thread.sleep(100);
                     if (text.startsWith("GET") || text.startsWith("HEAD")) {
-                        filename = text.split(" ")[1];
-                        if (filename.equals("/")) filename += "cover.html";
-                        else if (filename.contains("..")) filename = "/cover.html";
+                        request = text.split(" ")[1];
+                        if (request.equals("/")) request += "index";
+                        else if (request.contains("..")) request = "/index";
                     }
                     if(text.equalsIgnoreCase("Upgrade: websocket")|| //chrome
                             text.startsWith("Sec-WebSocket")||       //firefox
@@ -93,23 +92,48 @@ public class HTTPServer extends Thread {
 
                 //response
                 try {
-                    String path = folder + filename;
-                    byte[] datab = Files.readAllBytes(Paths.get(path));
+                    byte[] datab = new byte[0];
 
                     write("HTTP/1.1 200 OK");
                     write("Server: NiWa Nightly");
                     write("Content-Lenght: " + datab.length);
-                    if (filename.endsWith("html")) {
+                    if (request.endsWith("html")) {
+                        datab = Files.readAllBytes(Paths.get(folder + "/index.html"));
                         write("Content-Type: text/html");
-                    } else if (filename.endsWith("js")) {
+                    } else if (request.endsWith("js")) {
+                        datab = Files.readAllBytes(Paths.get(folder + request));
                         write("Content-Type: application/javascript");
-                    } else if (filename.endsWith("css")) {
+                    } else if (request.endsWith("css")) {
+                        datab = Files.readAllBytes(Paths.get(folder + request));
                         //datab = cssinterp(datab);
                         write("Content-Type: text/css");
-                    } else if (filename.endsWith("ico")) {
+                    } else if (request.endsWith("ico")) {
+                        datab = Files.readAllBytes(Paths.get(folder + request));
                         write("Content-Type: image/x-icon");
-                    } else if (filename.endsWith("svg")) {
+                    } else if (request.endsWith("svg")) {
+                        datab = Files.readAllBytes(Paths.get(folder + request));
                         write("Content-Type: image/svg+xml");
+                    } else if (request.equals("/index")){
+                        datab = Files.readAllBytes(Paths.get(folder + "/index.html"));
+                        write("Content-Type: text/html");
+                    } else if (request.equals("/login")){
+                        datab = Files.readAllBytes(Paths.get(folder + "/login.html"));
+                        write("Content-Type: text/html");
+                    } else if (request.equals("/signup")){
+                        datab = Files.readAllBytes(Paths.get(folder + "/signup.html"));
+                        write("Content-Type: text/html");
+                    } else if (request.equals("/home")){
+                        datab = Files.readAllBytes(Paths.get(folder + "/home.html"));
+                        write("Content-Type: text/html");
+                    } else if (request.startsWith("/study")){
+                        datab = Files.readAllBytes(Paths.get(folder + "/study.html"));
+                        write("Content-Type: text/html");
+                    } else if (request.equals("/account")){
+                        datab = Files.readAllBytes(Paths.get(folder + "/account.html"));
+                        write("Content-Type: text/html");
+                    } else if (request.startsWith("/channel")){
+                        datab = Files.readAllBytes(Paths.get(folder + "/channel.html"));
+                        write("Content-Type: text/html");
                     }
                     write("");
                     connection.getOutputStream().write(datab);
@@ -131,18 +155,6 @@ public class HTTPServer extends Thread {
                     System.out.println("HTTPSocket-Error(3): " + e);
                 }
             }
-        }
-
-        private byte[] cssinterp(byte[] data) throws Exception {
-            String css=new String(data);
-            String[] vars=css.split("#");
-            for(int i=1;i<vars.length;i++){
-                String[] name=vars[i].split(":",2);
-                String[] value=name[1].split(";", 2);
-                css=css.replace(name[0], value[0]);
-                css=css.replace("#" + value[0] + ":" + value[0] + ";", "");
-            }
-            return css.getBytes();
         }
     }
 }

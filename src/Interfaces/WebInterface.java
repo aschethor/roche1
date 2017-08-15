@@ -1,6 +1,7 @@
 package Interfaces;
 
 import Interfaces.ServerLib.HTTPServer;
+import Interfaces.ServerLib.WSServer;
 
 /**
  * https server for graphical user interface
@@ -9,7 +10,11 @@ import Interfaces.ServerLib.HTTPServer;
 public class WebInterface {
     private static final String directory = "C:\\Users\\wandeln\\IdeaProjects\\roche1\\src\\Website\\bootstrap-3.3.7-dist";
     public static void main(String... args){
-        new HTTPServer(directory).start();
+        new HTTPServer(directory){
+            @Override
+            public WSServer.WebSocket getWS() {
+                return new WebSocket();
+            }
+        }.start();
     }
-    //TODO
 }

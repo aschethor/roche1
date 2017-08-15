@@ -8,7 +8,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="../../favicon.ico">
+	<link rel="shortcut icon" href="favicon.ico">
 
     <title>StudyMe</title>
 
@@ -16,10 +16,11 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="cover.css" rel="stylesheet">
+    <link href="index.css" rel="stylesheet">
     <!-- Custom styles for this template -->
     <link href="login.css" rel="stylesheet">
-
+	<script src="cookie.js"></script>
+	<script src="login.js"></script>
   </head>
 
   <body>
@@ -35,9 +36,9 @@
               <h3 class="masthead-brand">StudyMe</h3>
               <nav>
                 <ul class="nav masthead-nav">
-                  <li><a href="index.html">Home</a></li>
-                  <li class="active"><a href="login.html">Login</a></li>
-                  <li><a href="#">Contact</a></li>
+                  <li><a href="index">Welcome</a></li>
+                  <li class="active"><a href="login">Login</a></li>
+                  <!--li><a href="">Contact</a></li-->
                 </ul>
               </nav>
             </div>
@@ -47,15 +48,10 @@
 		  <form class="form-signin">
 			<h2 class="form-signin-heading">Login</h2>
 			<label for="inputEmail" class="sr-only">Username</label>
-			<input type="text" id="inputEmail" class="form-control form-top" placeholder="Username">
+			<input type="text" id="login_username" class="form-control form-top" placeholder="Username">
 			<label for="inputPassword" class="sr-only">Password</label>
-			<input type="password" id="inputPassword" class="form-control form-bottom" placeholder="Password">
-			<div class="checkbox">
-			  <label>
-				<input type="checkbox" value="remember-me"> Remember me
-			  </label>
-			</div>
-			<button class="btn btn-lg btn-default btn-block" type="">Login</button>
+			<input type="password" id="login_password" class="form-control form-bottom" placeholder="Password" onkeypress="if(event.keyCode==13)login()">
+			<button class="btn btn-lg btn-default btn-block" type="button" onclick="login()">Login</button>
 		  </form>
 
           <div class="mastfoot">

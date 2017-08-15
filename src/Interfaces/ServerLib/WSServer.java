@@ -80,7 +80,7 @@ public abstract class WSServer extends Thread {
                     onMessage(recv());
                 }
             }catch (Exception e) {
-                //e.printStackTrace();
+                e.printStackTrace();
                 System.out.println("WebSocket-Error: " + e);
                 onEnd();
             }finally {

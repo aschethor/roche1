@@ -45,14 +45,16 @@ public class Channel {
         return ret;
     }
 
-    public void createSample(Account account,double value)throws Exception{
+    public Sample createSample(Account account,double value)throws Exception{
         if(!hasWritePermission(account))throw new Error("You don't have the author rights to add data to this channel");
-        Database.mysql.update("INSERT INTO data(ID_channel,data_value,ID_creator) VALUES (?,?,?)",""+id,""+value,""+account.getId());
+        int sample_id = Database.mysql.update("INSERT INTO data(ID_channel,data_value,ID_creator) VALUES (?,?,?)",""+id,""+value,""+account.getId());
+        return new Sample(sample_id);
     }
 
-    public void createSample(Account account,String time,double value)throws Exception{
+    public Sample createSample(Account account,String time,double value)throws Exception{
         if(!hasWritePermission(account))throw new Error("You don't have the author rights to add data to this channel");
-        Database.mysql.update("INSERT INTO data(ID_channel,data_time,data_value,ID_creator) VALUES (?,?,?,?)",""+id,time,""+value,""+account.getId());
+        int sample_id = Database.mysql.update("INSERT INTO data(ID_channel,data_time,data_value,ID_creator) VALUES (?,?,?,?)",""+id,time,""+value,""+account.getId());
+        return new Sample(sample_id);
     }
 
     public void removeSample(Account account,Sample sample)throws Exception{

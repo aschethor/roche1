@@ -48,7 +48,7 @@ public class Study {
 
     public Vector<Account> getAuthors(Account account)throws Exception{
         if(!hasReadPermission(account))throw new Error("You aren't allowed to read this study");
-        ResultSet resultSet = Database.mysql.query("SELECT a.ID_person FROM author a,person p WHERE a.ID_person=p.ID AND a.ID_study=?",""+id);
+        ResultSet resultSet = Database.mysql.query("SELECT a.ID_person FROM author a,person p WHERE a.ID_person=p.ID AND a.ID_study=? ORDER BY a.time",""+id);
         Vector<Account> ret = new Vector<>();
         while(resultSet.next())ret.add(new Account(resultSet.getInt("ID_person")));
         return ret;

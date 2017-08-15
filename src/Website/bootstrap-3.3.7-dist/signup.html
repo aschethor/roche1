@@ -8,7 +8,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="../../favicon.ico">
+	<link rel="shortcut icon" href="favicon.ico">
 
     <title>StudyMe</title>
 
@@ -16,10 +16,12 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="cover.css" rel="stylesheet">
+    <link href="index.css" rel="stylesheet">
     <!-- Custom styles for this template -->
     <link href="login.css" rel="stylesheet">
 
+	<script src="cookie.js"></script>
+	<script src="signup.js"></script>
   </head>
 
   <body>
@@ -35,9 +37,9 @@
               <h3 class="masthead-brand">StudyMe</h3>
               <nav>
                 <ul class="nav masthead-nav">
-                  <li><a href="index.html">Home</a></li>
-                  <li><a href="login.html">Login</a></li>
-                  <li><a href="#">Contact</a></li>
+                  <li><a href="index">Welcome</a></li>
+                  <li><a href="login">Login</a></li>
+                  <!--li><a href="">Contact</a></li-->
                 </ul>
               </nav>
             </div>
@@ -46,15 +48,15 @@
 		
 		  <form class="form-signin">
 			<h2 class="form-signin-heading">Sign Up</h2>
-			<label for="inputEmail" class="sr-only">Name</label>
-			<input type="text" id="inputEmail" class="form-control form-top" placeholder="Name">
-			<label for="inputPassword" class="sr-only">E-Mail</label>
-			<input type="text" id="inputPassword" class="form-control form-middle" placeholder="E-Mail">
 			<label for="inputPassword" class="sr-only">Username</label>
-			<input type="text" id="inputPassword" class="form-control form-middle" placeholder="Username">
+			<input type="text" id="signup_username" class="form-control form-top" placeholder="Username">
 			<label for="inputPassword" class="sr-only">Password</label>
-			<input type="password" id="inputPassword" class="form-control form-bottom" placeholder="Password">
-			<button class="btn btn-lg btn-default btn-block" href="cover.html">Sign Up</button>
+			<input type="password" id="signup_password" class="form-control form-middle" placeholder="Password">
+			<label for="inputEmail" class="sr-only">Name</label>
+			<input type="text" id="signup_name" class="form-control form-middle" placeholder="Name">
+			<label for="inputPassword" class="sr-only">E-Mail</label>
+			<input type="text" id="signup_email" class="form-control form-bottom" placeholder="E-Mail" onkeypress="if(event.keyCode==13)signup()">
+			<button class="btn btn-lg btn-default btn-block" type="button" onclick="signup()">Sign Up</button>
 		  </form>
 
           <div class="mastfoot">

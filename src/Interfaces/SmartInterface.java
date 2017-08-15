@@ -2,6 +2,7 @@ package Interfaces;
 
 import StudyMe.Account;
 import StudyMe.Channel;
+import StudyMe.Login;
 import StudyMe.Sample;
 
 import java.io.PrintWriter;
@@ -39,8 +40,8 @@ public class SmartInterface {
             String username="";
             try {
                 username = in.nextLine();
-                Account account = Account.getAccountByUsername(username);
                 String password = in.nextLine();
+                Account account = Login.login(username,password);
                 if(!password.equals(account.getPassword())){
                     System.out.println("someone tried to connect as "+username);
                     out.println("wrong password!");

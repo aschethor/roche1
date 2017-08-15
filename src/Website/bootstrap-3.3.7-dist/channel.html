@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -21,7 +20,7 @@
     <link href="../theme.css" rel="stylesheet">
 	
 	<script src="../cookie.js"></script>
-	<script src="../study.js"></script>
+	<script src="../channel.js"></script>
 
   </head>
 
@@ -41,54 +40,46 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href="#">Study</a></li>
+            <li class="active"><a>Channel</a></li>
+            <li><a id="study">Study</a></li>
             <li><a href="../home">Home</a></li>
             <li><a href="../account">Account</a></li>
+            <!--li><a href="#contact">Contact</a></li-->
           </ul>
-        </div>
+        </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container theme-showcase" role="main">
 
 
-      <div class="page-header">
-        <h1 id="study_name"></h1>
-      </div>
+      
 	  <div class="row">
-		  <div class="col-sm-8" id="description_tile">
-			<h2>Description</h2>
-			  <div class="well" id="description"></div>
-			  <button class="btn btn-default" id="edit_button" onclick="edit_description()">edit</button>
-		  </div>
-		  <div class="col-sm-4">
-			<h2>Authors</h2>
-			  <div class="list-group" id="authors"></div>
-			  <input type="text" id="add_author" class="form-control" placeholder="add author (username)" onkeypress="if(event.keyCode==13)add_author()">
-		  </div>
 		  <!--div class="col-sm-12">
 			<h2>Designer</h2>
 			<p>TODO...</p>
 		  </div-->
+		  <div class="col-sm-2"></div>
 		  <div class="col-sm-8">
-			<h2>Channels</h2>
-			  <div class="list-group" id="channels">
-			  </div>
-			  <input type="text" id="create_channel" class="form-control" placeholder="create channel" onkeypress="if(event.keyCode==13)create_channel()">
-			  </div>
-		  <!--div class="col-sm-8">
-			<h2>Similar Studies</h2>
-			<p>TODO...</p>
+			<div class="page-header">
+			  <h1 id="channel_name"></h1>
+			</div>
+			<!--TODO
+		    <button class="btn btn-default" id="import" onclick="import()">import</button>
+		    <button class="btn btn-default" id="export" onclick="export()">export</button-->
+			<h2>Insert</h2>
+			<div class="row">
+			  <div class="col-sm-6"><input type="text" id="create_sample_time" class="create_sample form-control" placeholder="time (yyyy-mm-dd hh:mm:ss.xx)"></div>
+			  <div class="col-sm-6"><input type="text" id="create_sample_value" class="create_sample form-control" placeholder="value (xx.xx)" onkeypress="if(event.keyCode==13)create_sample()"></div>
+			</div>
+			<h2>Samples</h2>
+		  	<div class="list-group" id="samples"></div>
 		  </div>
-		  <div class="col-sm-8">
-			<h2>Queries</h2>
+		  <!--div class="col-sm-8">
+			<h2>Graph</h2>
 			<p>TODO...</p>
 		  </div-->
 		  
-		  <div class="col-sm-8">
-			<h2>Delete Study</h2>
-		    <button class="btn btn-default" type="button" onclick="delete_study()">delete study</button>
-		  </div>
 	  </div>
 		
     </div> <!-- /container -->
