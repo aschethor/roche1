@@ -59,7 +59,7 @@ public class Channel {
 
     public void removeSample(Account account,Sample sample)throws Exception{
         if(!hasWritePermission(account))throw new Error("You don't have write permission to this channel");
-        Database.mysql.update("DELETE FROM data WHERE ID = ?",""+sample.getId());
+        Database.mysql.update("DELETE FROM data WHERE ID = ? AND ID_channel = ?",""+sample.getId(),""+id);
     }
 
     public int getId(){

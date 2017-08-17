@@ -43,3 +43,14 @@ textarea {
 .create_sample{
 	margin-bottom: 15px;
 }
+input{
+	width: 100%;
+}
+.channel_link{
+	float:left;
+	color:#2B7CE9;
+}
+.channel_link:hover{
+	float:left;
+	color:#97C2FC;
+}

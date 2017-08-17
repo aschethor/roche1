@@ -144,8 +144,26 @@ public class Study {
         if(!hasReadPermission(account))throw new Error("You aren't allowed to read this study");
         Study ret = account.createStudy(name);
         ret.setDescription(account,getDescription(account));
-        //TODO: Tag_pointers, Channels, data, Tag_tag, tag_channel
-        return null;
+        Vector<Tag> tags = getTags(account);
+        Map<Integer,Integer> tagMap = new HashMap<>();
+        for (int i=0;i<tags.size();i++)tagMap.put(tags.get(i).getId(),i);
+        Vector<TagLink> tagLinks = getTagLinks(account);
+        Vector<Channel> channels = getChannels(account);
+        Vector<Tag> newTags = new Vector<>();
+        for(int i=0;i<tags.size();i++){
+            newTags.add(ret.createTag(account,tags.get(i).getName(account)));
+            newTags.get(i).setViewX(account,tags.get(i).getViewX(account));
+            newTags.get(i).setViewY(account,tags.get(i).getViewY(account));
+        }
+        for(TagLink tl:tagLinks)ret.linkTags(account,newTags.get(tagMap.get(tl.getTag1().getId())),newTags.get(tagMap.get(tl.getTag2().getId())));
+        Vector<Channel> newChannels = new Vector<>();
+        for(int i=0;i<channels.size();i++){
+            newChannels.add(ret.createChannel(account,channels.get(i).getName(account)));
+            newChannels.get(i).setUnit(account,channels.get(i).getUnit(account));
+            for(Tag t:channels.get(i).getTags(account))newChannels.get(i).appendTag(account,newTags.get(tagMap.get(t.getId())));
+            for(Sample s:channels.get(i).getSamples(account))newChannels.get(i).createSample(account,s.getTime(),s.getValue());
+        }
+        return ret;
     }
 
     public void deleteStudy(Account account)throws Exception{
@@ -199,6 +217,8 @@ public class Study {
                 " AND l"+i+".ID_tag2 = t"+tagMap.get(tagLinks.get(i).getTag2().getId())+".ID) OR" +
                 " (l"+i+".ID_tag1 = t"+tagMap.get(tagLinks.get(i).getTag2().getId())+".ID"+
                 " AND l"+i+".ID_tag2 = t"+tagMap.get(tagLinks.get(i).getTag1().getId())+".ID))";
+        //at least one data sample in study
+        query += " AND EXISTS ( SELECT d.ID FROM data d, channel c WHERE d.ID_channel = c.ID AND c.ID_study = s.ID)";
         for (int i=0;i<tags.size();i++)query += ")";
         for (int i=0;i<tagLinks.size();i++)query += ")";
         //tag-links correspond to tag-links in this study
@@ -297,6 +317,8 @@ public class Study {
                 query += " AND EXISTS ( SELECT cl"+i+"_"+j+".ID FROM tag_channel cl"+i+"_"+j+" WHERE cl"+i+"_"+j+".ID_channel = c"+i+".ID AND cl"+i+"_"+j+".ID_tag = t"+tagMap.get(channelLinks.get(i).get(j).getId())+".ID";
             }
         }
+        //at least one data sample in study
+        query += " AND EXISTS ( SELECT d.ID FROM data d, channel c WHERE d.ID_channel = c.ID AND c.ID_study = s.ID)";
 
         for (int i=0;i<tags.size();i++)query += ")";
         for (int i=0;i<tagLinks.size();i++)query += ")";

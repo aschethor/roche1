@@ -13,9 +13,14 @@
     <title>StudyMe</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap theme -->
-    <link href="../css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="../bootstrap-3.3.7-dist/css/bootstrap-theme.min.css" rel="stylesheet">
+	
+	<!-- vis.js library -->
+	<script type="text/javascript" src="../vis-4.20.1/dist/vis.js"></script>
+    <link href="../vis-4.20.1/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
+
 
     <!-- Custom styles for this template -->
     <link href="../theme.css" rel="stylesheet">
@@ -51,8 +56,6 @@
     </nav>
 
     <div class="container theme-showcase" role="main">
-
-
       <div class="page-header">
         <h1 id="study_name"></h1>
       </div>
@@ -67,28 +70,38 @@
 			  <div class="list-group" id="authors"></div>
 			  <input type="text" id="add_author" class="form-control" placeholder="add author (username)" onkeypress="if(event.keyCode==13)add_author()">
 		  </div>
-		  <!--div class="col-sm-12">
-			<h2>Designer</h2>
-			<p>TODO...</p>
-		  </div-->
 		  <div class="col-sm-8">
-			<h2>Channels</h2>
-			  <div class="list-group" id="channels">
-			  </div>
-			  <input type="text" id="create_channel" class="form-control" placeholder="create channel" onkeypress="if(event.keyCode==13)create_channel()">
-			  </div>
-		  <!--div class="col-sm-8">
-			<h2>Similar Studies</h2>
-			<p>TODO...</p>
+			<h2>Designer</h2>
+			<div id="mynetwork" class = "well"style="height:400px;padding:0px;"></div>
+			<div class="row" id="edit_design_row">
+				<div class="col-sm-6"><input type="text" id="add_tag" class="form-control create_sample" placeholder="add tag" onkeypress="if(event.keyCode==13)add_tag()"></div>
+				<div class="col-sm-3"><button class="btn btn-default create_sample"style = "width: 100%" type="button" onclick="network.addEdgeMode()">add link</button></div>
+				<div class="col-sm-3"><button class="btn btn-default"style = "width: 100%" type="button" onclick="network.deleteSelected()">delete</button></div>
+			</div>
+			<!--button class="btn btn-default" id="edit_design_button" onclick="edit_design()">edit</button-->
 		  </div>
 		  <div class="col-sm-8">
-			<h2>Queries</h2>
-			<p>TODO...</p>
-		  </div-->
-		  
+			<h2>Similar Studies</h2>
+			<div class="list-group" id="similar_studies"></div>
+		    <button class="btn btn-default" type="button" onclick="search_similar_studies()">search</button>
+		  </div>
 		  <div class="col-sm-8">
-			<h2>Delete Study</h2>
-		    <button class="btn btn-default" type="button" onclick="delete_study()">delete study</button>
+			<h2>Channels</h2>
+			<div class="list-group" id="channels"></div>
+			<input type="text" id="create_channel" class="form-control" placeholder="create channel" onkeypress="if(event.keyCode==13)create_channel()">
+		  </div>
+		  <div class="col-sm-8">
+			<h2>Similar Channels</h2>
+			<div class="list-group" id="similar_channels"></div>
+		    <button class="btn btn-default" type="button" onclick="search_similar_channels()">search</button>
+		  </div>
+		  <div class="col-sm-8">
+			<h2>Edit</h2>
+			<div class="row">
+				<div class="col-sm-6"><input type="text" id="change_study_name" class="form-control create_sample" placeholder="" onkeypress="if(event.keyCode==13)change_study_name()"></div>
+				<div class="col-sm-6"><input type="text" id="copy_study" class="form-control create_sample" placeholder="copy study" onkeypress="if(event.keyCode==13)copy_study()"></div>
+				<div class="col-sm-6"><button class="btn btn-default" type="button" onclick="delete_study()">delete study</button></div>
+			</div>
 		  </div>
 	  </div>
 		
@@ -100,6 +113,7 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="../js/bootstrap.min.js"></script>
+    <script src="../bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	<script src="../study_designer.js"></script>
   </body>
 </html>

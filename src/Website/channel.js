@@ -12,16 +12,25 @@ connection.onerror = function(error){
 	console.log('WebSocket Error: '+error);
 }
 
+var linked_nodes=new Array();
+
 connection.onmessage = function(msg){
 	console.log('WebSocket Message: ' + msg.data);
 	var ret = JSON.parse(msg.data);
 	if(ret.error!=undefined){alert(ret.error);}
 	else if(ret.home!=undefined){window.open('../home',"_self");}
 	else if(ret.logout!=undefined){logout();}
-	else if(ret.channel_name!=undefined){document.getElementById("channel_name").innerHTML = ret.channel_name;}
+	else if(ret.channel_name!=undefined){
+		document.getElementById("channel_name").innerHTML = ret.channel_name;
+		document.getElementById("change_name").placeholder = ret.channel_name;}
+	else if(ret.channel_unit!=undefined){
+		document.getElementById("channel_unit").innerHTML = '['+ret.channel_unit+']';
+		document.getElementById("change_unit").placeholder = ret.channel_unit;}
 	else if(ret.sample!=undefined){document.getElementById("samples").innerHTML = '<a id="sample_'+ret.sample.id+'" class="list-group-item"><div style="width:50%;float: right;">'+ret.sample.value+'<div class="pull-right" onclick="remove_sample(event,'+ret.sample.id+')">X</div></div><div style="width:50%;">'+ret.sample.time+'</div></a>'+document.getElementById("samples").innerHTML;}
-	else if(ret.remove_sample!=undefined){removeElementById("channel_"+ret.remove_channel);}
+	else if(ret.remove_sample!=undefined){removeElementById("sample_"+ret.remove_sample);}
 	else if(ret.study_id!=undefined){document.getElementById("study").setAttribute('href','../study/'+ret.study_id);}
+	else if(ret.design!=undefined){fill_design(ret.design);}
+	else if(ret.link_node!=undefined){link_node(ret.link_node);}
 }
 
 function remove_sample(event,sample){
@@ -41,6 +50,24 @@ function create_sample(){
 	document.getElementById("create_sample_value").value = "";
 	document.getElementById("create_sample_time").value = "";
 	connection.send('{channel_change:{"username":"'+username+'","password":"'+password+'","id":"'+id+'","create_sample":{"time":"'+sample_time+'","value":"'+sample_value+'"}}}');
+}
+
+function change_name(){
+	var username = getCookie('username');
+	var password = getCookie('password');
+	var id = window.location.href.split('/').slice(-1)[0];
+	var name = document.getElementById("change_name").value;
+	document.getElementById("change_name").value = "";
+	connection.send('{channel_change:{"username":"'+username+'","password":"'+password+'","id":"'+id+'","change_name":"'+name+'"}}');
+}
+
+function change_unit(){
+	var username = getCookie('username');
+	var password = getCookie('password');
+	var id = window.location.href.split('/').slice(-1)[0];
+	var unit = document.getElementById("change_unit").value;
+	document.getElementById("change_unit").value = "";
+	connection.send('{channel_change:{"username":"'+username+'","password":"'+password+'","id":"'+id+'","change_unit":"'+unit+'"}}');	
 }
 
 function logout(){

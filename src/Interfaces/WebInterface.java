@@ -8,8 +8,8 @@ import Interfaces.ServerLib.WSServer;
  */
 
 public class WebInterface {
-    private static final String directory = "C:\\Users\\NiWa\\IdeaProjects\\roche1\\src\\Website\\bootstrap-3.3.7-dist";
-    //private static final String directory = "C:\\Users\\wandeln\\IdeaProjects\\roche1\\src\\Website\\bootstrap-3.3.7-dist";
+    //private static final String directory = "C:\\Users\\NiWa\\IdeaProjects\\roche1\\src\\Website\\bootstrap-3.3.7-dist";
+    private static final String directory = "C:\\Users\\wandeln\\IdeaProjects\\roche1\\src\\Website";
 
     public static void main(String... args){
         new HTTPServer(directory){

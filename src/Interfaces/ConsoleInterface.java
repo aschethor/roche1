@@ -168,7 +168,7 @@ public class ConsoleInterface {
                     out("possible actions:");
                     out("( 0) exit");
                     out("( 1) add tag link");
-                    out("( link ID) remove tag");
+                    out("( link ID) remove tag link");
                     choice = inInt();
                     if (choice == 0) {
                         cls();

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+	<link rel="shortcut icon" href="../favicon.ico">
+
+    <title>StudyMe</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap theme -->
+    <link href="../bootstrap-3.3.7-dist/css/bootstrap-theme.min.css" rel="stylesheet">
+
+	<!-- vis.js library -->
+	<script type="text/javascript" src="../vis-4.20.1/dist/vis.js"></script>
+    <link href="../vis-4.20.1/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Custom styles for this template -->
+    <link href="../theme.css" rel="stylesheet">
+	
+	<script src="../cookie.js"></script>
+	<script src="../connection.js"></script>
+	<script src="../channel.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index">StudyMe</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="active"><a>Channel</a></li>
+            <li><a id="study">Study</a></li>
+            <li><a href="../home">Home</a></li>
+            <li><a href="../account">Account</a></li>
+            <!--li><a href="#contact">Contact</a></li-->
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container theme-showcase" role="main">
+
+
+      
+	  <div class="row">
+		  <!--div class="col-sm-12">
+			<h2>Designer</h2>
+			<p>TODO...</p>
+		  </div-->
+		  <div class="col-sm-2"></div>
+		  <div class="col-sm-8">
+			<div class="page-header">
+			  <h1><div id="channel_unit" style="float:right"></div><div id="channel_name"></div></h1>
+			</div>
+			<h2>Designer</h2>
+			<div id="mynetwork" class = "well"style="height:400px;padding:0px;"></div>
+			<!--TODO
+		    <button class="btn btn-default" id="import" onclick="import()">import</button>
+		    <button class="btn btn-default" id="export" onclick="export()">export</button-->
+			<h2>Insert</h2>
+			<div class="row">
+			  <div class="col-sm-6"><input type="text" id="create_sample_time" class="create_sample form-control" placeholder="time (yyyy-mm-dd hh:mm:ss.xx)"></div>
+			  <div class="col-sm-6"><input type="text" id="create_sample_value" class="create_sample form-control" placeholder="value (xx.xx)" onkeypress="if(event.keyCode==13)create_sample()"></div>
+			</div>
+			<h2>Samples</h2>
+		  	<div class="list-group" id="samples"></div>
+			<h2>Edit</h2>
+			<div class="row">
+			  <div class="col-sm-6"><input type="text" id="change_name" class="create_sample form-control" placeholder="name" onkeypress="if(event.keyCode==13)change_name()"></div>
+			  <div class="col-sm-6"><input type="text" id="change_unit" class="create_sample form-control" placeholder="unit" onkeypress="if(event.keyCode==13)change_unit()"></div>
+			</div>
+		  </div>
+		  <!--div class="col-sm-8">
+			<h2>Graph</h2>
+			<p>TODO...</p>
+		  </div-->
+		  
+	  </div>
+		
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="../bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	<script src="../channel_designer.js"></script>
+  </body>
+</html>

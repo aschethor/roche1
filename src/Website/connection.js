@@ -6,7 +6,7 @@ connect();
 function connect(){
 	if((connection==undefined||connection.readyState!=1)
 		&&counter<4){
-		connection = new WebSocket('ws://192.168.0.113');
+		connection = new WebSocket('ws://127.0.0.1');
 		setTimeout(function(){connect();},1000);
 		counter++;
 	}
