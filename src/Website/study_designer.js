@@ -24,8 +24,8 @@ var options = {
 		enabled:false
 	},
 	interaction: {
-		dragNodes: true,
-		selectable: true
+		dragNodes: false,
+		selectable: false
 	},
 	nodes:{
 		color:{
@@ -98,7 +98,7 @@ function fill_design(design){
 		nodes: nodes,
 		edges: edges
 	  };
-	network = new vis.Network(container, data, options);
+	network.setData(data);
 	network.on("dragEnd",function(obj){
 		if(obj.nodes[0]!=undefined){
 			var username = getCookie('username');

@@ -32,4 +32,8 @@ public class TagLink {
     public Tag getTag2() {
         return tag2;
     }
+
+    public boolean has(Tag tag){
+        return (tag.getId()==tag1.getId()||tag.getId()==tag2.getId());
+    }
 }

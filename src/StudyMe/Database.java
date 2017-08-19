@@ -1,5 +1,7 @@
 package StudyMe;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException;
+
 import java.sql.*;
 
 public class Database {
@@ -17,7 +19,13 @@ public class Database {
     }
 
     public ResultSet query(String query, String... param) throws Exception{
-        PreparedStatement stat = connection.prepareStatement(query);
+        PreparedStatement stat;
+        try {
+            stat = connection.prepareStatement(query);
+        }catch (MySQLNonTransientConnectionException e){
+            connection = DriverManager.getConnection(dbURL,dbUsername,dbPassword);
+            stat = connection.prepareStatement(query);
+        }
         stat.setQueryTimeout(100);
         for(int i=0;i<param.length;i++){
             stat.setString(i+1,param[i]);
@@ -26,7 +34,13 @@ public class Database {
     }
 
     public int update(String query, String... param) throws Exception{
-        PreparedStatement stat = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement stat;
+        try {
+            stat = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+        }catch (MySQLNonTransientConnectionException e){
+            connection = DriverManager.getConnection(dbURL,dbUsername,dbPassword);
+            stat = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+        }
         stat.setQueryTimeout(5);
         for (int i = 0; i < param.length; i++) {
             stat.setString(i + 1, param[i]);

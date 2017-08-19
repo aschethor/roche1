@@ -123,7 +123,7 @@ public class WebSocket extends WSServer.WebSocket {
         } catch (Exception e) {
             e.printStackTrace();
             sendError("Ouups, something went wrong");
-            //sendLogout();
+            sendLogout();
         }
     }
 
@@ -134,6 +134,7 @@ public class WebSocket extends WSServer.WebSocket {
             Account account = Login.login(username, password);
             int channel_id = msg.getInt("id");
             Channel channel = new Channel(channel_id);
+            send(new JSONObject().put("write_permission",channel.hasWritePermission(account)).toString());
             send(new JSONObject().put("channel_name",channel.getName(account)).toString());
             send(new JSONObject().put("channel_unit",channel.getUnit(account)).toString());
             send(new JSONObject().put("study_id",channel.getStudy(account).getId()).toString());
@@ -187,7 +188,7 @@ public class WebSocket extends WSServer.WebSocket {
                 try {
                     Account author = Account.getAccountByUsername(msg.getString("add_author"));
                     study.addAuthor(account, author);
-                    send(new JSONObject().put("author", new JSONObject().put("name", author.getName()).put("id", author.getId())).toString());
+                    send(new JSONObject().put("author", new JSONObject().put("name", author.getName()).put("email", author.getEmail()).put("id", author.getId())).toString());
                 }catch (Exception e){
                     sendError("username not found or already author");
                 }
@@ -224,7 +225,11 @@ public class WebSocket extends WSServer.WebSocket {
                 msg = (JSONObject)msg.get("add_link");
                 Tag tag1 = new Tag(msg.getInt("tag1"));
                 Tag tag2 = new Tag(msg.getInt("tag2"));
-                study.linkTags(account,tag1,tag2);
+                try {
+                    study.linkTags(account, tag1, tag2);
+                }catch (Exception e){
+                    sendError("tags must be different!");//TODO... error handling
+                }
             }else if(msg.has("remove_link")){
                 msg = (JSONObject)msg.get("remove_link");
                 Tag tag1 = new Tag(msg.getInt("tag1"));
@@ -264,9 +269,10 @@ public class WebSocket extends WSServer.WebSocket {
             Account account = Login.login(username, password);
             int study_id = msg.getInt("id");
             Study study = new Study(study_id);
+            send(new JSONObject().put("write_permission",study.hasWritePermission(account)).toString());
             send(new JSONObject().put("study_name",study.getName(account)).toString());
             send(new JSONObject().put("description",study.getDescription(account)).toString());
-            for(Account a:study.getAuthors(account))send(new JSONObject().put("author",new JSONObject().put("name",a.getName()).put("id",a.getId())).toString());
+            for(Account a:study.getAuthors(account))send(new JSONObject().put("author",new JSONObject().put("name",a.getName()).put("email",a.getEmail()).put("id",a.getId())).toString());
             for(Channel c:study.getChannels(account))send(new JSONObject().put("channel",new JSONObject().put("name",c.getName(account)).put("id",c.getId()).put("unit",c.getUnit(account))).toString());
             JSONObject design = new JSONObject();
             Vector<Tag> tags = study.getTags(account);
@@ -277,7 +283,7 @@ public class WebSocket extends WSServer.WebSocket {
         } catch (Exception e) {
             e.printStackTrace();
             sendError("Ouups, something went wrong");
-            //sendLogout();
+            sendLogout();
         }
     }
 

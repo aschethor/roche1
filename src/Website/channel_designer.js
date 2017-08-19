@@ -28,7 +28,7 @@ var options = {
 		dragNodes: false,
 		dragView: false,
 		zoomView: false,
-		selectable: true
+		selectable: false
 	},
 	nodes: {
 		chosen: false,
@@ -103,7 +103,7 @@ function fill_design(design){
 		nodes: nodes,
 		edges: edges
 	  };
-	network = new vis.Network(container, data, options);
+	network.setData(data);
 	network.on("click",function(obj){
 		if(obj.nodes[0]!=undefined){
 			if(linked_nodes.hasOwnProperty(obj.nodes[0])&&linked_nodes[obj.nodes[0]]!=0){

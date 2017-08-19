@@ -74,18 +74,10 @@
 			<!--TODO
 		    <button class="btn btn-default" id="import" onclick="import()">import</button>
 		    <button class="btn btn-default" id="export" onclick="export()">export</button-->
-			<h2>Insert</h2>
-			<div class="row">
-			  <div class="col-sm-6"><input type="text" id="create_sample_time" class="create_sample form-control" placeholder="time (yyyy-mm-dd hh:mm:ss.xx)"></div>
-			  <div class="col-sm-6"><input type="text" id="create_sample_value" class="create_sample form-control" placeholder="value (xx.xx)" onkeypress="if(event.keyCode==13)create_sample()"></div>
-			</div>
+			<div id="insert_part"></div>
 			<h2>Samples</h2>
 		  	<div class="list-group" id="samples"></div>
-			<h2>Edit</h2>
-			<div class="row">
-			  <div class="col-sm-6"><input type="text" id="change_name" class="create_sample form-control" placeholder="name" onkeypress="if(event.keyCode==13)change_name()"></div>
-			  <div class="col-sm-6"><input type="text" id="change_unit" class="create_sample form-control" placeholder="unit" onkeypress="if(event.keyCode==13)change_unit()"></div>
-			</div>
+			<div id="edit_part"></div>
 		  </div>
 		  <!--div class="col-sm-8">
 			<h2>Graph</h2>
