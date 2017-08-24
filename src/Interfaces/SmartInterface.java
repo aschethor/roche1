@@ -1,9 +1,6 @@
 package Interfaces;
 
-import StudyMe.Account;
-import StudyMe.Channel;
-import StudyMe.Login;
-import StudyMe.Sample;
+import StudyMe.*;
 
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -59,6 +56,8 @@ public class SmartInterface {
                         int channelId = Integer.parseInt(in.nextLine());
                         System.out.println(""+channelId);
                         Channel channel = new Channel(channelId);
+                        out.println(channel.getName(account));
+                        out.println(channel.getUnit(account));
                         Vector<Sample> samples = channel.getSamples(account);
                         for(Sample s:samples){
                             out.println(""+s.getTime());
@@ -66,21 +65,66 @@ public class SmartInterface {
                         }
                         out.println("end");
                     }else if(option.equals("insert into channel")){
+                        System.out.print(username+" inserts into channel ");
                         int channelId = Integer.parseInt(in.nextLine());
+                        System.out.println(""+channelId);
+                        Channel channel = new Channel(channelId);
+                        out.println(channel.getName(account));
+                        out.println(channel.getUnit(account));
                         while(true) {
-                            Channel channel = new Channel(channelId);
                             String time = in.nextLine();
-                            if(time.equals("end"))
-                            channel.createSample(account, time, Double.parseDouble(in.nextLine()));
+                            if(time.equals("end"))break;
+                            double value = Double.parseDouble(in.nextLine());
+                            channel.createSample(account, time, value);
+                            System.out.println("Sample created: "+time+" "+value);
+                        }
+                    }else if(option.equals("import study")) {
+                        Study study = account.createStudy(in.nextLine());
+                        study.setDescription(account,in.nextLine());
+                        while (true){
+                            option = in.nextLine();
+                            if(option.equals("done"))break;
+                            else if(option.equals("create tag")){
+                                Tag tag = study.createTag(account,in.nextLine());
+                                System.out.println("created tag: "+tag.getName(account));
+                                out.println(tag.getId());
+                                out.flush();
+                            }else if(option.equals("link tags")){
+                                study.linkTags(account,new Tag(Integer.parseInt(in.nextLine())),new Tag(Integer.parseInt(in.nextLine())));
+                            }else if(option.equals("create channel")){
+                                Channel channel = study.createChannel(account,in.nextLine());
+                                out.println(channel.getId());
+                                out.flush();
+                                channel.setUnit(account,in.nextLine());
+                                channel.setComment(account,in.nextLine());
+                                while (true){
+                                    option = in.nextLine();
+                                    if(option.equals("end"))break;
+                                    String value = in.nextLine();
+                                    String comment = in.nextLine();
+                                    try{
+                                        channel.createSample(account,option,Double.parseDouble(value),comment);
+                                    }catch(Exception e){
+                                        //for NaN - responses
+                                        channel.createSample(account,option,Double.NaN,comment);
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }else if(option.equals("link channel")){
+                                new Channel(Integer.parseInt(in.nextLine())).appendTag(account,new Tag(Integer.parseInt(in.nextLine())));
+                            }
                         }
                     }else{
                         out.println("wrong option!");
+                        out.flush();
                     }
+                    out.println("bye");
                     out.flush();
                 }
                 System.out.println("Connection with "+username+" ended");
                 socket.close();
             }catch (Exception e){
+                e.printStackTrace();
                 System.out.println("Connection with "+username+" abruptly ended");
                 //e.printStackTrace();
             }

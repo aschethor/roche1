@@ -1,14 +1,14 @@
 ﻿"use strict";
 
-connection.onopen = function(){
+function onOpen(){
 	console.log('connection opened');
 }
 
-connection.onerror = function(error){
+function onError(error){
 	console.log('WebSocket Error: '+error);
 }
 
-connection.onmessage = function(msg){
+function onMessage(msg){
 	console.log('WebSocket Message: ' + msg.data);
 	var ret = JSON.parse(msg.data);
 	if(ret.error!=undefined){alert(ret.error);}

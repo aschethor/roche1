@@ -24,7 +24,6 @@
     <link href="../theme.css" rel="stylesheet">
 	
 	<script src="../cookie.js"></script>
-	<script src="../connection.js"></script>
 	<script src="../channel.js"></script>
 
   </head>
@@ -59,32 +58,36 @@
 
 
       
-	  <div class="row">
-		  <!--div class="col-sm-12">
-			<h2>Designer</h2>
-			<p>TODO...</p>
-		  </div-->
-		  <div class="col-sm-2"></div>
-		  <div class="col-sm-8">
+	<div class="row">
+		<!--div class="col-sm-12">
+		<h2>Designer</h2>
+		<p>TODO...</p>
+		</div-->
+		<div class="col-sm-2"></div>
+		<div class="col-sm-8">
 			<div class="page-header">
-			  <h1><div id="channel_unit" style="float:right"></div><div id="channel_name"></div></h1>
+				<h1><div id="channel_unit" style="float:right"></div><div id="channel_name"></div></h1>
+			</div>
+			<div id="comment_tile">
+				<h2>Comment</h2>
+				<div class="well" id="comment"></div>
 			</div>
 			<h2>Designer</h2>
 			<div id="mynetwork" class = "well"style="height:400px;padding:0px;"></div>
 			<!--TODO
-		    <button class="btn btn-default" id="import" onclick="import()">import</button>
-		    <button class="btn btn-default" id="export" onclick="export()">export</button-->
+			<button class="btn btn-default" id="import" onclick="import()">import</button>
+			<button class="btn btn-default" id="export" onclick="export()">export</button-->
 			<div id="insert_part"></div>
 			<h2>Samples</h2>
-		  	<div class="list-group" id="samples"></div>
+			<div class="list-group" id="samples"></div>
 			<div id="edit_part"></div>
-		  </div>
-		  <!--div class="col-sm-8">
-			<h2>Graph</h2>
-			<p>TODO...</p>
-		  </div-->
-		  
-	  </div>
+		</div>
+		<!--div class="col-sm-8">
+		<h2>Graph</h2>
+		<p>TODO...</p>
+		</div-->
+	  
+	</div>
 		
     </div> <!-- /container -->
 
@@ -96,5 +99,6 @@
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
     <script src="../bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
 	<script src="../channel_designer.js"></script>
+	<script src="../connection.js"></script>
   </body>
 </html>

@@ -21,6 +21,7 @@ public class Account {
     }
 
     public void setPassword(String password)throws Exception{
+        checkPasswordStrength(password);
         Database.mysql.update("UPDATE person SET password = ? WHERE id = ?",password,""+id);
     }
 
@@ -79,5 +80,12 @@ public class Account {
 
     public void deleteAccount()throws Exception{
         Database.mysql.update("DELETE FROM person WHERE id = ?",""+id);
+    }
+
+    public static void checkPasswordStrength(String pwd)throws Exception{
+        if(pwd.length()<8)throw new Error("length of password too short");
+        if(!pwd.matches(".*\\d+.*"))throw new Error("password must contain at least one digit");
+        if(pwd.equals(pwd.toLowerCase()))throw new Error("password must contain at least one uppercase letter");
+        if(pwd.equals(pwd.toUpperCase()))throw new Error("password must contain at least one lowercase letter");
     }
 }

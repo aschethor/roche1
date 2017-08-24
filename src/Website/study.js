@@ -2,7 +2,7 @@
 
 var write_permission = false;
 
-connection.onopen = function(){
+function onOpen(){
 	console.log('connection opened');
 	var username = getCookie('username');
 	var password = getCookie('password');
@@ -10,11 +10,11 @@ connection.onopen = function(){
 	connection.send('{study:{"username":"'+username+'","password":"'+password+'","id":"'+id+'"}}');
 }
 
-connection.onerror = function(error){
+function onError(error){
 	console.log('WebSocket Error: '+error);
 }
 
-connection.onmessage = function(msg){
+function onMessage(msg){
 	console.log('WebSocket Message: ' + msg.data);
 	var ret = JSON.parse(msg.data);
 	if(ret.error!=undefined){alert(ret.error);}

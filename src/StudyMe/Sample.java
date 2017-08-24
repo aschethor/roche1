@@ -7,6 +7,7 @@ public class Sample {
     private String creationTime;
     private String time;
     private double value;
+    private String comment;
 
     public Sample(int id)throws Exception{
         this.id = id;
@@ -15,13 +16,15 @@ public class Sample {
         creationTime = resultSet.getString("time");
         time = resultSet.getString("data_time");
         value = resultSet.getDouble("data_value");
+        comment = resultSet.getString("comment");
     }
 
-    public Sample(int id,String creationTime,String time,double value){
+    public Sample(int id,String creationTime,String time,double value,String comment){
         this.id = id;
         this.creationTime = creationTime;
         this.time = time;
         this.value = value;
+        this.comment = comment;
     }
 
     public int getId(){
@@ -35,5 +38,8 @@ public class Sample {
     }
     public double getValue(){
         return value;
+    }
+    public String getComment() {
+        return comment;
     }
 }

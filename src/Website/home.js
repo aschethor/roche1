@@ -1,17 +1,17 @@
 ﻿"use strict";
 
-connection.onopen = function(){
+function onOpen(){
 	console.log('connection opened');
 	var username = getCookie('username');
 	var password = getCookie('password');
 	connection.send('{home:{"username":"'+username+'","password":"'+password+'"}}');
 }
 
-connection.onerror = function(error){
+function onError(error){
 	console.log('WebSocket Error: '+error);
 }
 
-connection.onmessage = function(msg){
+function onMessage(msg){
 	console.log('WebSocket Message: ' + msg.data);
 	var ret = JSON.parse(msg.data);
 	if(ret.error!=undefined){alert(ret.error);}
@@ -19,7 +19,7 @@ connection.onmessage = function(msg){
 	else if(ret.name!=undefined){document.getElementById("greetings").innerHTML = "Hi "+ret.name+"!";}
 	else if(ret.goto_study!=undefined){window.open('study/'+ret.goto_study,"_self");}
 	else if(ret.study!=undefined){
-		document.getElementById("studies").innerHTML += '<a href="study/'+ret.study.id+'" class="list-group-item">'+ret.study.name+'</a>';
+		document.getElementById("studies").innerHTML = '<a href="study/'+ret.study.id+'" class="list-group-item">'+ret.study.name+'</a>'+document.getElementById("studies").innerHTML;
 	}else if(ret.logout!=undefined){logout();}
 }
 

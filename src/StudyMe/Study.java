@@ -66,7 +66,7 @@ public class Study {
 
     public Vector<Channel> getChannels(Account account)throws Exception{
         if(!hasReadPermission(account))throw new Error("You aren't allowed to read this study");
-        ResultSet resultSet = Database.mysql.query("SELECT ID FROM channel WHERE ID_study = ?",""+id);
+        ResultSet resultSet = Database.mysql.query("SELECT ID FROM channel WHERE ID_study = ? ORDER BY name",""+id);
         Vector<Channel> ret = new Vector<>();
         while(resultSet.next())ret.add(new Channel(resultSet.getInt("id")));
         return ret;
@@ -75,9 +75,10 @@ public class Study {
     public Channel createChannel(Account account,String name)throws Exception{
         if(!hasWritePermission(account))throw new Error("You aren't allowed to create channels");
         try{
-            int channelId = Database.mysql.update("INSERT INTO channel(name,ID_study,ID_creator,unit) VALUES(?,?,?,?)",name,""+id,""+account.getId(),"");
+            int channelId = Database.mysql.update("INSERT INTO channel(name,ID_study,ID_creator,unit,comment) VALUES(?,?,?,?,\"\")",name,""+id,""+account.getId(),"");
             return new Channel(channelId);
         }catch (Exception e){
+            e.printStackTrace();
             throw new Error("study couldn't be created. Make sure channel name is unique in this study.");
         }
     }
@@ -524,7 +525,8 @@ public class Study {
         query += " AND EXISTS ( SELECT d.ID FROM data d, channel c WHERE d.ID_channel = c.ID AND c.ID_study = s.ID)";
         for(int i=0;i<numberOfTags+numberOfLinks;i++)query+=")";
         for(Vector<Tag> cl:channelLinks)for(Tag t:cl)query+=")";
-
+        query += "ORDER BY s.ID";
+        for(int i=0;i<channels.size();i++)query+=", c"+i+".name";
         System.out.println("Super Monster query:");
         System.out.println(query);
         long currentTime = System.currentTimeMillis();

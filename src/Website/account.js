@@ -1,17 +1,17 @@
 ﻿"use strict";
 
-connection.onopen = function(){
+function onOpen(){
 	console.log('connection opened');
 	var username = getCookie('username');
 	var password = getCookie('password');
 	connection.send('{account:{"username":"'+username+'","password":"'+password+'"}}');
 }
 
-connection.onerror = function(error){
+function onError(error){
 	console.log('WebSocket Error: '+error);
 }
 
-connection.onmessage = function(msg){
+function onMessage(msg){
 	console.log('WebSocket Message: ' + msg.data);
 	var ret = JSON.parse(msg.data);
 	if(ret.error!=undefined){alert(ret.error);}

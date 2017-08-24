@@ -2,6 +2,7 @@ package Interfaces;
 
 import Interfaces.ServerLib.WSServer;
 import StudyMe.*;
+import StudyMe.Error;
 import org.json.JSONObject;
 
 import java.text.NumberFormat;
@@ -97,10 +98,11 @@ public class WebSocket extends WSServer.WebSocket {
                     msg = (JSONObject) msg.get("create_sample");
                     double value = Double.parseDouble(msg.getString("value"));
                     String time = msg.getString("time");
+                    String comment = msg.getString("comment");
                     Sample s;
-                    if (time.equals("")) s = channel.createSample(account, value);
-                    else s = channel.createSample(account, time, value);
-                    send(new JSONObject().put("sample", new JSONObject().put("time", s.getTime()).put("value", s.getValue()).put("id", s.getId())).toString());
+                    if (time.equals("")) s = channel.createSample(account, value, comment);
+                    else s = channel.createSample(account, time, value, comment);
+                    send(new JSONObject().put("sample", new JSONObject().put("time", s.getTime()).put("value", s.getValue()).put("comment", s.getComment()).put("id", s.getId())).toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                     sendError("wrong input format");
@@ -114,6 +116,9 @@ public class WebSocket extends WSServer.WebSocket {
             }else if(msg.has("change_unit")){
                 channel.setUnit(account,msg.getString("change_unit"));
                 send(new JSONObject().put("channel_unit",channel.getUnit(account)).toString());
+            }else if(msg.has("change_comment")){
+                channel.setComment(account,msg.getString("change_comment"));
+                send(new JSONObject().put("channel_comment",channel.getComment(account)).toString());
             }else if(msg.has("link_tag")){
                 channel.appendTag(account,new Tag(msg.getInt("link_tag")));
                 send(new JSONObject().put("link_node",msg.getString("link_tag")).toString());
@@ -137,8 +142,9 @@ public class WebSocket extends WSServer.WebSocket {
             send(new JSONObject().put("write_permission",channel.hasWritePermission(account)).toString());
             send(new JSONObject().put("channel_name",channel.getName(account)).toString());
             send(new JSONObject().put("channel_unit",channel.getUnit(account)).toString());
+            send(new JSONObject().put("channel_comment",channel.getComment(account)).toString());
             send(new JSONObject().put("study_id",channel.getStudy(account).getId()).toString());
-            for(Sample s:channel.getSamples(account))send(new JSONObject().put("sample",new JSONObject().put("time",s.getTime()).put("value",s.getValue()).put("id",s.getId())).toString());
+            for(Sample s:channel.getSamples(account))send(new JSONObject().put("sample",new JSONObject().put("time",s.getTime()).put("value",s.getValue()).put("comment",s.getComment()).put("id",s.getId())).toString());
             JSONObject design = new JSONObject();
             Vector<Tag> tags = channel.getStudy(account).getTags(account);
             for(int i=0;i<tags.size();i++)design.put("tag"+i,new JSONObject().put("name",tags.get(i).getName(account)).put("id",tags.get(i).getId()).put("x",tags.get(i).getViewX(account)).put("y",tags.get(i).getViewY(account)));
@@ -300,8 +306,12 @@ public class WebSocket extends WSServer.WebSocket {
                     sendError("username already taken");
                 }
             }else if(msg.has("change_password")){
-                account.setPassword(msg.getString("change_password"));
-                send(new JSONObject().put("password",account.getPassword()).toString());
+                try {
+                    account.setPassword(msg.getString("change_password"));
+                    send(new JSONObject().put("password", account.getPassword()).toString());
+                }catch (Error e){
+                    sendError(e.toString());
+                }
             }else if(msg.has("change_name")){
                 account.setName(msg.getString("change_name"));
                 send(new JSONObject().put("name",account.getName()).toString());
@@ -348,15 +358,18 @@ public class WebSocket extends WSServer.WebSocket {
     }
 
     public void handleSignup(JSONObject msg)throws Exception{
-        try{
+        try {
             String username = msg.getString("username");
             String password = msg.getString("password");
             String name = msg.getString("name");
             String email = msg.getString("email");
-            Login.createAccount(username,password,name,email);
-            send(new JSONObject().put("home","").toString());
+            Login.createAccount(username, password, name, email);
+            send(new JSONObject().put("home", "").toString());
+        }catch(StudyMe.Error e){
+            sendError(e.toString());
         }catch (Exception e){
-            sendError("username already taken");
+            e.printStackTrace();
+            sendError("Oups, something very bad happened");
         }
     }
 

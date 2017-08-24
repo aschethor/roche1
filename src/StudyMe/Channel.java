@@ -34,13 +34,25 @@ public class Channel {
         Database.mysql.update("UPDATE channel SET unit = ? WHERE id = ?",unit,""+id);
     }
 
+    public String getComment(Account account)throws Exception{
+        if(!hasReadPermission(account))throw new Error("You don't have read permission for this channel");
+        ResultSet resultSet = Database.mysql.query("SELECT comment FROM channel WHERE ID = ?",""+id);
+        if(!resultSet.next())throw new Error("channel not found");
+        return resultSet.getString("comment");
+    }
+
+    public void setComment(Account account,String name)throws Exception{
+        if(!hasWritePermission(account))throw new Error("You don't have write permission for this channel");
+        Database.mysql.update("UPDATE channel SET comment = ? WHERE id = ?",name,""+id);
+    }
+
     //eventually with range parameters
     public Vector<Sample> getSamples(Account account)throws Exception{
         if(!hasReadPermission(account))throw new Error("You don't have read permission for this channel");
         ResultSet resultSet = Database.mysql.query("SELECT * FROM data WHERE ID_channel = ? ORDER BY data_time ASC",""+id);
         Vector<Sample> ret = new Vector<>();
         while(resultSet.next()){
-            ret.add(new Sample(resultSet.getInt("id"),resultSet.getString("time"),resultSet.getString("data_time"),resultSet.getDouble("data_value")));
+            ret.add(new Sample(resultSet.getInt("id"),resultSet.getString("time"),resultSet.getString("data_time"),resultSet.getDouble("data_value"),resultSet.getString("comment")));
         }
         return ret;
     }
@@ -51,9 +63,21 @@ public class Channel {
         return new Sample(sample_id);
     }
 
+    public Sample createSample(Account account,double value,String comment)throws Exception{
+        if(!hasWritePermission(account))throw new Error("You don't have the author rights to add data to this channel");
+        int sample_id = Database.mysql.update("INSERT INTO data(ID_channel,data_value,comment,ID_creator) VALUES (?,?,?,?)",""+id,""+value,comment,""+account.getId());
+        return new Sample(sample_id);
+    }
+
     public Sample createSample(Account account,String time,double value)throws Exception{
         if(!hasWritePermission(account))throw new Error("You don't have the author rights to add data to this channel");
         int sample_id = Database.mysql.update("INSERT INTO data(ID_channel,data_time,data_value,ID_creator) VALUES (?,?,?,?)",""+id,time,""+value,""+account.getId());
+        return new Sample(sample_id);
+    }
+
+    public Sample createSample(Account account,String time,double value,String comment)throws Exception{
+        if(!hasWritePermission(account))throw new Error("You don't have the author rights to add data to this channel");
+        int sample_id = Database.mysql.update("INSERT INTO data(ID_channel,data_time,data_value,comment,ID_creator) VALUES (?,?,?,?,?)",""+id,time,""+value,comment,""+account.getId());
         return new Sample(sample_id);
     }
 

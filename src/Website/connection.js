@@ -13,3 +13,7 @@ function connect(){
 	else if(counter==undefined||connection.readyState!=1)
 		alert("keine Verbindung möglich!");
 }
+
+connection.onopen = function(){onOpen()}
+connection.onerror = function(error){onError(error)}
+connection.onmessage = function(msg){onMessage(msg)}
