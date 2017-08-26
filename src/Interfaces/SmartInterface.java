@@ -106,7 +106,13 @@ public class SmartInterface {
                                         channel.createSample(account,option,Double.parseDouble(value),comment);
                                     }catch(Exception e){
                                         //for NaN - responses
-                                        channel.createSample(account,option,Double.NaN,comment);
+                                        System.out.println("time: "+option);
+                                        System.out.println("value: "+Double.NaN);
+                                        System.out.println("comment: "+comment);
+                                        try{channel.createSample(account,option,Double.NaN,comment);}
+                                        catch (Exception e2){
+                                            e2.printStackTrace();
+                                        }
                                         e.printStackTrace();
                                     }
                                 }

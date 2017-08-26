@@ -102,4 +102,11 @@ public class Tag {
     public boolean hasReadPermission(Account account){
         return true;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(!(o instanceof Tag))return false;
+        if(id!=((Tag) o).id)return false;
+        return true;
+    }
 }

@@ -10,6 +10,9 @@ public class Database {
     private static final String dbPassword = "";
 
     private Connection connection;
+
+    //use this Database object only for small queries!
+    //otherwise other threads that are querying with this object will be blocked!
     public static Database mysql = new Database();
 
     public Database(){
@@ -50,4 +53,14 @@ public class Database {
         if (!res.next()) return -1;
         return res.getInt(1);
     }
+
+    public static void printResultSet(ResultSet resultSet)throws Exception{
+        while (resultSet.next()){
+            for(int i=1;i<=resultSet.getMetaData().getColumnCount();i++){
+                System.out.print("| "+resultSet.getString(i)+" ");
+            }
+            System.out.println("|");
+        }
+    }
+
 }

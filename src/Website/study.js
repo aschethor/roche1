@@ -49,8 +49,8 @@ function add_edit_elements(){
 }
 
 function add_similar_channels(msg){
-	var addHTML = '<a class="list-group-item" onclick="goto_study(event,'+msg.s_id+')">.<div style = "float:left">'+msg.s_name+':</div>';
-	if(msg["c_0"]!=undefined)addHTML+='<div onclick="goto_channel(event,'+msg.c_0.id+')" class="channel_link">'+msg.c_0.name+' ['+msg.c_0.unit+']</div>';
+	var addHTML = '<a style="overflow:auto" class="list-group-item" onclick="goto_study(event,'+msg.s_id+')"><div style = "float:left">'+msg.s_name+':</div>';
+	if(msg["c_0"]!=undefined)addHTML+='<div style="float:left" onclick="goto_channel(event,'+msg.c_0.id+')" class="channel_link">'+msg.c_0.name+' ['+msg.c_0.unit+']</div>';
 	var i=1;
 	while(msg["c_"+i]!=undefined){
 		addHTML+='<div onclick="goto_channel(event,'+msg["c_"+i].id+')" class="channel_link">, '+msg["c_"+i].name+' ['+msg["c_"+i].unit+']</div>';

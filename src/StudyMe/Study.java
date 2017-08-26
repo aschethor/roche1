@@ -1,5 +1,7 @@
 package StudyMe;
 
+import com.sun.org.apache.regexp.internal.RETest;
+
 import java.beans.VetoableChangeListener;
 import java.sql.ResultSet;
 import java.util.HashMap;
@@ -179,6 +181,34 @@ public class Study {
         Database.mysql.update("DELETE FROM study WHERE id = ?",""+id);
     }
 
+    private class PriorityTag implements Comparable{
+        Tag tag;
+        int linkedElements; //number of channels & tags in the query that are linked to this tag
+        int tagFrequency;   //how frequent is this tag in the database?
+        PriorityTag(Tag t,int Tag_ID)throws Exception{//Tag_ID: pointer to "real tag"
+            tag = t;
+            linkedElements=0;
+            ResultSet resultSet = Database.mysql.query("SELECT count(*) FROM tag_pointer p WHERE p.ID_tag=?",""+Tag_ID);
+            resultSet.next();
+            tagFrequency=resultSet.getInt(1);
+        }
+        void incrementLinkedElements(){
+            linkedElements++;
+        }
+        @Override
+        public int compareTo(Object o) {
+            PriorityTag priorityTag = (PriorityTag)o;
+            //System.out.println("Compare "+tag.getId()+" to "+priorityTag.tag.getId());
+            //number of linked elements should be large
+            if(linkedElements<priorityTag.linkedElements)return +1;
+            if(linkedElements>priorityTag.linkedElements)return -1;
+            //tag frequency should be small
+            if(tagFrequency>priorityTag.tagFrequency)return +1;
+            if(tagFrequency<priorityTag.tagFrequency)return -1;
+            return 0;
+        }
+    }
+
     public Vector<Study> getSimilarStudiesSuperNaive(Account account)throws Exception{
         if(!hasReadPermission(account))throw new Error("You aren't allowed to read this study");
         Vector<Tag> tags = getTags(account);
@@ -235,34 +265,6 @@ public class Study {
         return ret;
     }
 
-    private class PriorityTag implements Comparable{
-        Tag tag;
-        int linkedElements; //number of channels & tags in the query that are linked to this tag
-        int tagFrequency;   //how frequent is this tag in the database?
-        PriorityTag(Tag t,int Tag_ID)throws Exception{//Tag_ID: pointer to "real tag"
-            tag = t;
-            linkedElements=0;
-            ResultSet resultSet = Database.mysql.query("SELECT count(*) FROM tag_pointer p WHERE p.ID_tag=?",""+Tag_ID);
-            resultSet.next();
-            tagFrequency=resultSet.getInt(1);
-        }
-        void incrementLinkedElements(){
-            linkedElements++;
-        }
-        @Override
-        public int compareTo(Object o) {
-            PriorityTag priorityTag = (PriorityTag)o;
-            //System.out.println("Compare "+tag.getId()+" to "+priorityTag.tag.getId());
-            //number of linked elements should be large
-            if(linkedElements<priorityTag.linkedElements)return +1;
-            if(linkedElements>priorityTag.linkedElements)return -1;
-            //tag frequency should be small
-            if(tagFrequency>priorityTag.tagFrequency)return +1;
-            if(tagFrequency<priorityTag.tagFrequency)return -1;
-            return 0;
-        }
-    }
-
     public Vector<Study> getSimilarStudies(Account account)throws Exception{
         if(!hasReadPermission(account))throw new Error("You aren't allowed to read this study");
         PriorityQueue<PriorityTag> remainingTags = new PriorityQueue<>();
@@ -276,6 +278,7 @@ public class Study {
         Vector<TagLink> stagedTagLinks = new Vector<>();
         int numberOfTags = remainingTags.size();
         int numberOfLinks = remainingTagLinks.size();
+        long currentTime = System.currentTimeMillis();
         String query = "SELECT DISTINCT s.ID FROM study s WHERE TRUE";
         while(remainingTags.size()!=0){
             PriorityTag tag = remainingTags.poll();
@@ -322,11 +325,78 @@ public class Study {
         for(int i=0;i<numberOfTags+numberOfLinks;i++)query+=")";
         System.out.println("Monster query:");
         System.out.println(query);
-        long currentTime = System.currentTimeMillis();
         ResultSet resultSet = Database.mysql.query(query);
         System.out.println("query time: "+((double)System.currentTimeMillis()-currentTime)/1000+" s");
         Vector<Study> ret = new Vector<>();
         while (resultSet.next())ret.add(new Study(resultSet.getInt("s.ID")));
+        return ret;
+    }
+
+    public Vector<Study> getSimilarStudiesTEMP(Account account)throws Exception{
+        if(!hasReadPermission(account))throw new Error("You aren't allowed to read this study");
+        Database mysql = new Database();
+        PriorityQueue<PriorityTag> remainingTags = new PriorityQueue<>();
+        Vector<PriorityTag> priorityTagVector = new Vector<>();
+        for(Tag t:getTags(account)){
+            PriorityTag priorityTag = new PriorityTag(t,t.getTagId(account));
+            remainingTags.add(priorityTag);
+            priorityTagVector.add(priorityTag);
+        }
+        Vector<TagLink> remainingTagLinks = getTagLinks(account);
+        Vector<TagLink> stagedTagLinks = new Vector<>();
+        long currentTime = System.currentTimeMillis();
+        int tableIterator = 0;
+        mysql.update("CREATE TEMPORARY TABLE table"+tableIterator+" AS SELECT s.ID as sID FROM study s");
+        tableIterator++;
+        while(remainingTags.size()!=0){
+            PriorityTag tag = remainingTags.poll();
+            mysql.update("CREATE TEMPORARY TABLE table"+tableIterator+" AS SELECT t.*, tp.ID as tID"+tag.tag.getId()+" FROM table"+(tableIterator-1)+" t,tag_pointer tp WHERE tp.ID_tag = "+tag.tag.getTagId(account)+" AND tp.ID_study = t.sID");
+            tableIterator++;
+            for(int i=0;i<stagedTagLinks.size();i++){
+                if(stagedTagLinks.get(i).has(tag.tag)){
+                    //possible improvement: bring links before tags into play (already during staging process...)
+                    //-> more sophisticated query for tags necessary
+                    mysql.update("CREATE TEMPORARY TABLE table"+tableIterator+" AS SELECT t.* FROM table"+(tableIterator-1)+" t,tag_tag l WHERE "+
+                            " ((l.ID_tag1 = tID"+stagedTagLinks.get(i).getTag1().getId()+
+                            " AND l.ID_tag2 = tID"+stagedTagLinks.get(i).getTag2().getId()+") OR" +
+                            " (l.ID_tag1 = tID"+stagedTagLinks.get(i).getTag2().getId()+
+                            " AND l.ID_tag2 = tID"+stagedTagLinks.get(i).getTag1().getId()+"))");
+                    tableIterator++;
+
+                    stagedTagLinks.remove(i);
+                    i--;
+                }
+            }
+            for(int i=0;i<remainingTagLinks.size();i++){
+                if(remainingTagLinks.get(i).has(tag.tag)){
+                    //increment linked elements in remainingTags - PriorityQueue
+                    if(remainingTagLinks.get(i).getTag1().getId()==tag.tag.getId()){
+                        for(int j=0;j<priorityTagVector.size();j++){
+                            if(remainingTagLinks.get(i).getTag2().getId()==priorityTagVector.get(j).tag.getId()){
+                                priorityTagVector.get(j).incrementLinkedElements();
+                                remainingTags.remove(priorityTagVector.get(j));
+                                remainingTags.add(priorityTagVector.get(j));
+                            }
+                        }
+                    }else{
+                        for(int j=0;j<priorityTagVector.size();j++){
+                            if(remainingTagLinks.get(i).getTag1().getId()==priorityTagVector.get(j).tag.getId()){
+                                priorityTagVector.get(j).incrementLinkedElements();
+                                remainingTags.remove(priorityTagVector.get(j));
+                                remainingTags.add(priorityTagVector.get(j));
+                            }
+                        }
+                    }
+                    stagedTagLinks.add(remainingTagLinks.get(i));
+                    remainingTagLinks.remove(i);
+                    i--;
+                }
+            }
+        }
+        ResultSet resultSet = mysql.query("SELECT DISTINCT sID FROM table"+(tableIterator-1)+" t WHERE EXISTS ( SELECT d.ID FROM data d, channel c WHERE d.ID_channel = c.ID AND c.ID_study = t.sID)");
+        System.out.println("query time: "+((double)System.currentTimeMillis()-currentTime)/1000+" s");
+        Vector<Study> ret = new Vector<>();
+        while (resultSet.next())ret.add(new Study(resultSet.getInt("sID")));
         return ret;
     }
 
@@ -436,7 +506,7 @@ public class Study {
         return ret;
     }
 
-    public Vector<Vector<Channel>> getSimilarChannels(Account account)throws Exception{
+    public Vector<Vector<Channel>> getSimilarChannelsSELECT(Account account)throws Exception{
         if(!hasReadPermission(account))throw new Error("You aren't allowed to read this study");
         Vector<Channel> channels = getChannels(account);
         if(channels.size()<=0)throw new Error("The study needs at least one channel in order to search for similar channels");
@@ -536,6 +606,104 @@ public class Study {
         while (resultSet.next()){
             Vector<Channel> channelVector = new Vector<>();
             for(int i=0;i<channels.size();i++)channelVector.add(new Channel(resultSet.getInt("c"+i+".ID")));
+            ret.add(channelVector);
+        }
+        return ret;
+    }
+
+    public Vector<Vector<Channel>> getSimilarChannels(Account account)throws Exception{
+        if(!hasReadPermission(account))throw new Error("You aren't allowed to read this study");
+        Database mysql = new Database();
+        PriorityQueue<PriorityTag> remainingTags = new PriorityQueue<>();
+        Vector<Tag> insertedTags = new Vector<>();
+        Vector<PriorityTag> priorityTagVector = new Vector<>();
+        for(Tag t:getTags(account)){
+            PriorityTag priorityTag = new PriorityTag(t,t.getTagId(account));
+            remainingTags.add(priorityTag);
+            priorityTagVector.add(priorityTag);
+        }
+        Vector<TagLink> remainingTagLinks = getTagLinks(account);
+        Vector<Channel> channels = getChannels(account);
+        HashMap<Channel,Integer> channelindices = new HashMap<>();//for indices in returned SELECT statement (c1,c2,...)
+        for(int i=0;i<channels.size();i++)channelindices.put(channels.get(i),i);
+        if(channels.size()<=0)throw new Error("The study needs at least one channel in order to search for similar channels");
+        Vector<Vector<Tag>> channelLinks = new Vector<>();
+        for(Channel channel:channels)channelLinks.add(channel.getTags(account));
+        Vector<TagLink> stagedTagLinks = new Vector<>();
+        long currentTime = System.currentTimeMillis();
+        int tableIterator = 0;
+        mysql.update("CREATE TEMPORARY TABLE table"+tableIterator+" AS SELECT s.ID as sID FROM study s");
+        tableIterator++;
+        while(remainingTags.size()!=0){
+            PriorityTag tag = remainingTags.poll();
+            mysql.update("CREATE TEMPORARY TABLE table"+tableIterator+" AS SELECT t.*, tp.ID as tID"+tag.tag.getId()+" FROM table"+(tableIterator-1)+" t,tag_pointer tp WHERE tp.ID_tag = "+tag.tag.getTagId(account)+" AND tp.ID_study = t.sID");
+            tableIterator++;
+            insertedTags.add(tag.tag);
+            for(int i=0;i<stagedTagLinks.size();i++){
+                if(stagedTagLinks.get(i).has(tag.tag)){
+                    //possible improvement: bring links before tags into play (already during staging process...)
+                    //-> more sophisticated query for tags necessary
+                    mysql.update("CREATE TEMPORARY TABLE table"+tableIterator+" AS SELECT t.* FROM table"+(tableIterator-1)+" t,tag_tag l WHERE "+
+                            " ((l.ID_tag1 = tID"+stagedTagLinks.get(i).getTag1().getId()+
+                            " AND l.ID_tag2 = tID"+stagedTagLinks.get(i).getTag2().getId()+") OR" +
+                            " (l.ID_tag1 = tID"+stagedTagLinks.get(i).getTag2().getId()+
+                            " AND l.ID_tag2 = tID"+stagedTagLinks.get(i).getTag1().getId()+"))");
+                    tableIterator++;
+                    stagedTagLinks.remove(i);
+                    i--;
+                }
+            }
+            for(int i=0;i<remainingTagLinks.size();i++){
+                if(remainingTagLinks.get(i).has(tag.tag)){
+                    //increment linked elements in remainingTags - PriorityQueue
+                    if(remainingTagLinks.get(i).getTag1().getId()==tag.tag.getId()){
+                        for(int j=0;j<priorityTagVector.size();j++){
+                            if(remainingTagLinks.get(i).getTag2().getId()==priorityTagVector.get(j).tag.getId()){
+                                priorityTagVector.get(j).incrementLinkedElements();
+                                remainingTags.remove(priorityTagVector.get(j));
+                                remainingTags.add(priorityTagVector.get(j));
+                            }
+                        }
+                    }else{
+                        for(int j=0;j<priorityTagVector.size();j++){
+                            if(remainingTagLinks.get(i).getTag1().getId()==priorityTagVector.get(j).tag.getId()){
+                                priorityTagVector.get(j).incrementLinkedElements();
+                                remainingTags.remove(priorityTagVector.get(j));
+                                remainingTags.add(priorityTagVector.get(j));
+                            }
+                        }
+                    }
+                    stagedTagLinks.add(remainingTagLinks.get(i));
+                    remainingTagLinks.remove(i);
+                    i--;
+                }
+            }
+            for(int i=0;i<channels.size();i++){
+                if(insertedTags.containsAll(channelLinks.get(i))){
+                    String query = "CREATE TEMPORARY TABLE table"+tableIterator+" AS SELECT t.*, c.ID as c"+channelindices.get(channels.get(i))+" FROM table"+(tableIterator-1)+" t, channel c WHERE c.ID_study = sID";
+                    tableIterator++;
+                    if(!channels.get(i).getName(account).equals("?"))query += " AND c.name = '"+channels.get(i).getName(account)+"'";
+                    if(!channels.get(i).getUnit(account).equals("?"))query += " AND c.unit = '"+channels.get(i).getUnit(account)+"'";
+                    for(Tag t:channelLinks.get(i)) {
+                        query += " AND EXISTS ( SELECT cl.ID FROM tag_channel cl WHERE cl.ID_channel = c.ID AND cl.ID_tag = tID" + t.getId();
+                    }
+                    for(int j=0;j<channelLinks.get(i).size();j++)query+=")";
+                    mysql.update(query);
+                    channelLinks.remove(i);
+                    channels.remove(i);
+                    i--;
+                }
+            }
+        }
+        String query = "SELECT DISTINCT sID";
+        for(Channel channel:channelindices.keySet())query+=", c"+channelindices.get(channel);
+        query +=  "  FROM table"+(tableIterator-1)+" t WHERE EXISTS ( SELECT d.ID FROM data d, channel c WHERE d.ID_channel = c.ID AND c.ID_study = t.sID)";
+        ResultSet resultSet = mysql.query(query);
+        System.out.println("query time: "+((double)System.currentTimeMillis()-currentTime)/1000+" s");
+        Vector<Vector<Channel>> ret = new Vector<>();
+        while (resultSet.next()){
+            Vector<Channel> channelVector = new Vector<>();
+            for(int i=0;i<channelindices.size();i++)channelVector.add(new Channel(resultSet.getInt("c"+i)));
             ret.add(channelVector);
         }
         return ret;
