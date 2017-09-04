@@ -709,6 +709,26 @@ public class Study {
         return ret;
     }
 
+    public String exportSimilarChannels2CSV(Account account)throws Exception{
+        Vector<Vector<Channel>> channels = getSimilarChannels(account);
+        String ret = "Result-Nr, Channel-Nr, Study-ID, Channel-ID, Study-Name, Channel-Name, Channel-Unit, Time, Value, Comment\n";
+        for(int i=0;i<channels.size();i++){
+            String studyName = channels.get(i).get(0).getStudy(account).getName(account);
+            String studyId = ""+channels.get(i).get(0).getStudy(account).getId();
+            for(int j=0;j<channels.get(i).size();j++){
+                String channelId = ""+channels.get(i).get(j).getId();
+                String channelName = channels.get(i).get(j).getName(account);
+                String channelUnit = channels.get(i).get(j).getUnit(account);
+                Vector<Sample> samples = channels.get(i).get(j).getSamples(account);
+                for(int k=0;k<samples.size();k++){
+                    ret += ""+i+", "+j+", "+studyId+", "+channelId+", "+studyName+", "+channelName+", "+channelUnit+", "+samples.get(k).getTime()+
+                            ", "+samples.get(k).getValue()+", "+samples.get(k).getComment()+"\n";
+                }
+            }
+        }
+        return ret;
+    }
+
     public boolean hasWritePermission(Account account){
         try{
             ResultSet resultSet = Database.mysql.query("SELECT ID_person FROM author WHERE ID_person = ? AND ID_study = ?",""+account.getId(),""+id);

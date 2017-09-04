@@ -1,5 +1,8 @@
 package Interfaces.ServerLib;
 
+import StudyMe.Login;
+import StudyMe.Study;
+
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -126,8 +129,17 @@ public class HTTPServer extends Thread {
                         datab = Files.readAllBytes(Paths.get(folder + "/home.html"));
                         write("Content-Type: text/html");
                     } else if (request.startsWith("/study")){
-                        datab = Files.readAllBytes(Paths.get(folder + "/study.html"));
-                        write("Content-Type: text/html");
+                        if(request.contains("export.csv")){
+                            System.out.println(request.split("/")[2]);
+                            Study study = new Study(Integer.parseInt(request.split("/")[2]));
+                            String File = study.exportSimilarChannels2CSV(Login.login("Nils","1234"));//"a, b, c\n1, 2, 3\n 4, 5, 6";
+                            System.out.println(File);
+                            datab = File.getBytes();
+                            write("Content-Type: text/csv");
+                        }else {
+                            datab = Files.readAllBytes(Paths.get(folder + "/study.html"));
+                            write("Content-Type: text/html");
+                        }
                     } else if (request.equals("/account")){
                         datab = Files.readAllBytes(Paths.get(folder + "/account.html"));
                         write("Content-Type: text/html");

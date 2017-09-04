@@ -1,5 +1,6 @@
 package StudyMe;
 
+import com.mysql.jdbc.exceptions.jdbc4.CommunicationsException;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException;
 
 import java.sql.*;
@@ -11,7 +12,7 @@ public class Database {
 
     private Connection connection;
 
-    //use this Database object only for small queries!
+    //use this Database connection object only for small queries!
     //otherwise other threads that are querying with this object will be blocked!
     public static Database mysql = new Database();
 
@@ -25,15 +26,18 @@ public class Database {
         PreparedStatement stat;
         try {
             stat = connection.prepareStatement(query);
+            stat.setQueryTimeout(100);
+            for(int i=0;i<param.length;i++){
+                stat.setString(i+1,param[i]);
+            }
+            return stat.executeQuery();
         }catch (MySQLNonTransientConnectionException e){
             connection = DriverManager.getConnection(dbURL,dbUsername,dbPassword);
-            stat = connection.prepareStatement(query);
+            return query(query,param);
+        }catch (CommunicationsException e){
+            connection = DriverManager.getConnection(dbURL,dbUsername,dbPassword);
+            return query(query,param);
         }
-        stat.setQueryTimeout(100);
-        for(int i=0;i<param.length;i++){
-            stat.setString(i+1,param[i]);
-        }
-        return stat.executeQuery();
     }
 
     public int update(String query, String... param) throws Exception{
